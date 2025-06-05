@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<style>
+    .my_alert{
+    background-color: rgba(200,0,0,0.2);
+    }
+    .my_x{
+    outline: none;
+    }
+</style>
+<body>
+    <header>
+        <nav class="navbar">
+          <div class="logo">CR</div>
+          <ul class="nav-links">
+              <li><a href="{{ url_for('home') }}">Home</a></li>
+              <li><a href="{{ url_for('FAQ_page') }}">FAQ</a></li>
+              <li><a href="{{ url_for('login') }}">Login</a></li>
+          </ul>
+        </nav>
+    </header>
+  <div style="text-align: center;">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+              <div class="my_alert" style="color: red;">
+                  <button onclick="this.parentElement.style.display='none'">×</button>
+                  {{ message }}
+              </div>
+            {% endfor %}
+        {% endif %}
+      {% endwith %}
+      <h2>Sign Up</h2>
+      <form action="{{ url_for('signup') }}" method="POST">
+        <input type="text" name="username" placeholder="Username" required><br>
+        <input type="email" name="email" placeholder="Email" required><br>
+        <input type="password" name="password" placeholder="Password" required><br>
+        <button type="submit" style="margin: 10px;">Sign Up</button>
+      </form>
+  </div>
+  <script>
+
+  /*
+    document.querySelector('form').addEventListener('submit', function(e) {
+      const email = document.querySelector('[name="email"]').value;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const password = document.querySelector('[name="password"]').value;
+
+      if (!emailRegex.test(email)) {
+        alert('Please enter a valid email address.');
+        e.preventDefault();
+      } else if (password.length < 6) {
+        alert('Password must be at least 6 characters long.');
+        e.preventDefault();
+      }
+    });
+  */
+  </script>
+</body>
+</html>

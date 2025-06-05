@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>hello world</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <style>
+      .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2 columns */
+            gap: 10px; /* spacing between items */
+            max-width: 1540px; /* Set a maximum width for the grid container */
+            margin: 0 auto;    /* Center the grid container horizontally */
+          }
+      .grid-item {
+        background-color: #eef;
+        border: 1px solid #aaa;
+        padding: 20px;
+        text-align: center;
+        overflow: hidden;
+      }
+    </style>
+</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<body>
+  <header>
+    {% if current_user.is_authenticated %}
+    <nav class="navbar">
+      <div class="logo">CR</div>
+      <ul class="nav-links">
+        <li><a href="{{ url_for('home') }}">Home</a></li>
+        <li><a href="{{ url_for('FAQ_page') }}">FAQ</a></li>
+        <li><a href="{{ url_for('profile') }}">{{ current_user.username }}</a></li>
+        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+      </ul>
+    </nav>
+    {% else %}
+    <nav class="navbar">
+      <div class="logo">CR</div>
+      <ul class="nav-links">
+        <li><a href="{{ url_for('home') }}">Home</a></li>
+        <li><a href="{{ url_for('FAQ_page') }}">FAQ</a></li>
+        <li><a href="{{ url_for('login') }}">Login</a></li>
+        <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+      </ul>
+    </nav>
+    {% endif %}
+  </header>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="my_success" style="color: black;">
+                    <button onclick="this.parentElement.style.display='none'">×</button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <h2 style="text-align: center;">cyclic rotations:</h2>
+    <div class="grid-container">
+      {% set row = 0 %}
+      {% set col = 0 %}
+
+      {% for item in rotations %}
+        <div class="grid-item" data-row="{{ row }}" data-col="{{ col }}" style="width: 620px; height: 135px">
+            <svg stroke="black" width="620" height="135">
+                <line x1="10" y1="25" x2="610" y2="25"/>
+                <line x1="10" y1="50" x2="610" y2="50"/>
+                <line x1="10" y1="75" x2="610" y2="75"/>
+                <line x1="10" y1="100" x2="610" y2="100"/>
+                <line x1="10" y1="125" x2="610" y2="125"/>
+                {% for i in range(item|length) %}
+                    {% set xpos = (600 // (item|length)) * i + 18 %}
+
+                    {% if 'kick' in item[i] %}
+                        <circle cx="{{ xpos }}" cy="125" r="8" fill="black" />
+                    {% endif %}
+                    {% if 'snare' in item[i] %}
+                        <circle cx="{{ xpos }}" cy="100" r="8" fill="white" stroke="black" />
+                    {% endif %}
+                    {% if 'hi-hat' in item[i] %}
+                        <text x="{{ xpos }}" y="50" font-size="20" text-anchor="middle">✖</text>
+                    {% endif %}
+                    {% if 'tom-1' in item[i] %}
+                        <circle cx="{{ xpos }}" cy="62.5" r="8" fill="black" />
+                    {% endif %}
+                    {% if 'tom-2' in item[i] %}
+                        <circle cx="{{ xpos }}" cy="75" r="8" fill="black" />
+                    {% endif %}
+                    {% if 'floor' in item[i] %}
+                        <circle cx="{{ xpos }}" cy="87.5" r="8" fill="black" />
+                    {% endif %}
+                    {% if 'rest' in item[i] %}
+                        <text x="{{ xpos }}" y="75" font-size="40" text-anchor="middle">𝄾</text>
+                    {% endif %}
+
+                {% endfor %}
+            </svg>
+        </div>
+
+        {% set col = col + 1 %}
+        {% if col > 2 %}
+          {% set col = 0 %}
+          {% set row = row + 1 %}
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div style="text-align: center;">
+    {% if current_user.is_authenticated %}
+    <form id="saveForm" method="POST" action="{{ url_for('cyclic_rotated_entry_page') }}">
+        <input type="hidden" name="rotations" id="rotationsInput">
+        <button type="button" style="margin-top: 20px;" onclick="save_ex()">SAVE PAGE TO MY ACCOUNT!</button>
+    </form>
+    {% endif %}
+    <button type="button" style="margin: 20px;" id="downloadPdfBtn">DOWNLOAD AS PDF!</button>
+    </div>
+    <script>
+      const rotations = {{ rotations | tojson }};
+
+      function save_ex() {
+        const input = document.getElementById("rotationsInput");
+        input.value = JSON.stringify(rotations);
+        document.getElementById("saveForm").submit();
+      }
+
+        document.getElementById("downloadPdfBtn").addEventListener("click", async () => {
+            const { jsPDF } = window.jspdf;
+
+            const downloadBtn = document.getElementById("downloadPdfBtn");
+            const saveForm = document.getElementById("saveForm");
+
+            // Hide buttons before capturing
+            downloadBtn.style.display = "none";
+            if (saveForm) saveForm.style.display = "none";
+
+            const target = document.querySelector("body");
+
+            // Wait for the DOM to update
+            await new Promise((r) => setTimeout(r, 100));
+
+            // Make canvas from the target
+            const canvas = await html2canvas(target, { scale: 2 });
+
+            const imgData = canvas.toDataURL("image/png");
+
+            const pdf = new jsPDF("p", "pt", "a4");
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+
+            const imgWidth = canvas.width;
+            const imgHeight = canvas.height;
+
+            const ratio = pdfWidth / imgWidth;
+            const scaledHeight = imgHeight * ratio;
+
+            if (scaledHeight < pdfHeight) {
+                pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, scaledHeight);
+            } else {
+                let position = 0;
+                let pageHeightLeft = scaledHeight;
+
+                while (pageHeightLeft > 0) {
+                    pdf.addImage(imgData, "PNG", 0, position, pdfWidth, scaledHeight);
+                    pageHeightLeft -= pdfHeight;
+                    position -= pdfHeight;
+                    if (pageHeightLeft > 0) pdf.addPage();
+                }
+            }
+
+            pdf.save("page.pdf");
+
+            // Restore buttons
+            downloadBtn.style.display = "inline-block";
+            if (saveForm) saveForm.style.display = "block";
+        });
+    </script>
+</body>
+</html>

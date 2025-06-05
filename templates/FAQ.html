@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FAQ Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <style>
+        .my_p{
+        font-size: 30px;
+        }
+        .label_bolding{
+        background-color: rgba(230,230,230, 1);
+        border: 1px solid #ccc;
+        border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+  <header>
+    {% if current_user.is_authenticated %}
+    <nav class="navbar">
+      <div class="logo">CR</div>
+      <ul class="nav-links">
+          <li><a href="{{ url_for('home') }}">Home</a></li>
+          <li><a href="{{ url_for('profile') }}">{{ current_user.username }}</a></li>
+          <li><a href="{{ url_for('logout') }}">Logout</a></li>
+      </ul>
+    </nav>
+    {% else %}
+    <nav class="navbar">
+      <div class="logo">CR</div>
+      <ul class="nav-links">
+        <li><a href="{{ url_for('home') }}">Home</a></li>
+        <li><a href="{{ url_for('login') }}">Login</a></li>
+        <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+      </ul>
+    </nav>
+    {% endif %}
+  </header>
+<div style="margin-left: 30px;">
+    <p class="my_p">Question 1:</p>
+    <h1 style="font-size: 80px;">What the <strong>F**K</strong> is a 'Cyclic Rotator'????</h1>
+    <p class="my_p">Answer:</p>
+    <p>Watch this video please, it will explain everything:</p>
+    <video class="my-video" width="640" height="360" controls>
+      <source src="{{ url_for('static', filename='fillervid.mp4') }}" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    <p>If you still do not understand what is going on, do not worry, there is also a written explanation:</p>
+    <p><strong>Cyclic Rotations</strong></p>
+    <p>A cyclic rotation is a type of operation which can be performed on a sequence of elements. It causes each element in
+        the sequence to move by a fixed amount, in a circular way. This means that when an element reaches the end of
+        the sequence, it wraps around to the beginning. For example, if you cyclically rotate the
+        list <strong class="label_bolding">[A, B, C, D]</strong> to the right by one position, it becomes
+        <strong class="label_bolding">[D, A, B, C]</strong>. Rotating it to the left by one would
+        result in <strong class="label_bolding">[B, C, D, A]</strong>.</p>
+    <p>In the context of drum exercises, the cyclic rotations of an exercise could be thought of as shifting the
+        starting point of a pattern while keeping the overall sequence the same. For example, if you have a
+        sticking pattern like <strong class="label_bolding">R L L R</strong>, a cyclic rotation would involve starting from a different point in the pattern,
+        such as <strong class="label_bolding">L L R R</strong>, <strong class="label_bolding">L R R L</strong>,
+        or <strong class="label_bolding">R R L L</strong>, depending on the direction and number of steps rotated.
+        This helps drummers develop fluidity, ambidexterity, and familiarity with how patterns feel starting on different
+        hands/limbs or beats, which is essential for improvisation and versatility.</p>
+    <p><strong>What This Tool (Website) Does</strong></p>
+    <p>This tool allows you to create a drum exercise (using the <a href="{{ url_for('editor_page') }}">Editor</a>),
+        then quickly view all cyclic rotations of that exercise (by clicking the <strong>"Cyclic Rotate!"</strong>
+        button). </p>
+    <p>The <strong>subdivision</strong> box allows you to choose a subdivision for the grid (i.e.- the entire grid of
+    the editor is split into even sections according to the current chosen subdivision value). Changing the subdivision
+    automatically deletes all notes currently placed on the grid, so be careful.</p>
+    <p>Places\beats which you will leave blank will be understood by the editor as rests.</p>
+    <p><strong>Example</strong></p>
+    <p>Let's say I've drawn the following exercise:</p>
+    <img src="{{ url_for('static', filename='editorpic.jpg') }}">
+    <p>Pressing the <strong>"Cyclic Rotate!"</strong> button would produce this page of cyclic rotations:</p>
+    <img src="{{ url_for('static', filename='cycledpic.jpg') }}">
+    <p>Notice that the top left variation is identical to our original exercise.</p>
+    <p>The following variations are all cyclic rotations (to the left) of our exercise, each one by a different amount (shift).</p>
+    <p>The top right variation is our exercise shifted by 1, the variation in the second row, left side, is our exercise
+    shifted by 2, the following variation is our exercise shifted by 3, and so on...</p>
+
+    <p class="my_p">Question 2:</p>
+    <h1 style="font-size: 40px;">Why should I make an account? What will that give me?</h1>
+    <p class="my_p">Answer:</p>
+    <p>Making an account will enable you to save exercises which you create and access them at a later time, when
+    you log in to the site.</p>
+
+    <p class="my_p">Question 3:</p>
+    <h1 style="font-size: 40px;">Do I have to make an account in order to use the website?</h1>
+    <p class="my_p">Answer:</p>
+    <p>You absolutely <strong>do not</strong> have to make an account in order to use the site. You can still create exercises and view
+    their cyclic rotations, you just won't have the option to save them.</p>
+
+
+</div>
+</body>
+</html>

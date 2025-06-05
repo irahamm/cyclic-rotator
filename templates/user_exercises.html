@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <title>{{ current_user.username }}'s Exercises</title>
+    <style>
+    /* Basic context menu styling */
+    #custom-context-menu {
+        position: absolute;
+        display: none;
+        background: #fff;
+        border: 1px solid #ccc;
+        z-index: 1000;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    #custom-context-menu ul {
+        list-style: none;
+        margin: 0;
+        padding: 5px 0;
+    }
+
+    #custom-context-menu li {
+        padding: 5px 20px;
+        cursor: pointer;
+    }
+
+    #custom-context-menu li:hover {
+        background: #eee;
+    }
+    </style>
+</head>
+<body>
+    <header>
+        {% if current_user.is_authenticated %}
+        <nav class="navbar">
+          <div class="logo">CR</div>
+          <ul class="nav-links">
+            <li><a href="{{ url_for('home') }}">Home</a></li>
+            <li><a href="{{ url_for('FAQ_page') }}">FAQ</a></li>
+            <li><a href="{{ url_for('profile') }}">{{ current_user.username }}</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+          </ul>
+        </nav>
+        {% else %}
+        <nav class="navbar">
+          <div class="logo">CR</div>
+          <ul class="nav-links">
+            <li><a href="{{ url_for('home') }}">Home</a></li>
+            <li><a href="{{ url_for('FAQ_page') }}">FAQ</a></li>
+            <li><a href="{{ url_for('login') }}">Login</a></li>
+            <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+          </ul>
+        </nav>
+        {% endif %}
+    </header>
+    <div id="custom-context-menu" style="display:none; position:absolute; z-index:1000; background-color: white;">
+        <ul>
+          <li id="delete-item">Delete</li>
+        </ul>
+    </div>
+    <div style="margin-left: 30px;">
+        <h1>Your Exercises:</h1>
+        {% if ex_data %}
+            <h2>(You can click an exercise to view its cyclic rotations. You can also delete an exercise via right click.)</h2>
+            {% for item, ex_id in ex_data %}
+            <div>
+                <svg stroke="black" width="620" height="135" class="dada" data-exercise='{{ item|tojson }}' data-ex_id='{{ ex_id|tojson }}'>
+                    <line x1="10" y1="25" x2="610" y2="25"/>
+                    <line x1="10" y1="50" x2="610" y2="50"/>
+                    <line x1="10" y1="75" x2="610" y2="75"/>
+                    <line x1="10" y1="100" x2="610" y2="100"/>
+                    <line x1="10" y1="125" x2="610" y2="125"/>
+                    {% for i in range(item|length) %}
+                        {% set xpos = (600 // (item|length)) * i + 18 %}
+
+                        {% if 'kick' in item[i] %}
+                            <circle cx="{{ xpos }}" cy="125" r="8" fill="black" />
+                        {% endif %}
+                        {% if 'snare' in item[i] %}
+                            <circle cx="{{ xpos }}" cy="100" r="8" fill="white" stroke="black" />
+                        {% endif %}
+                        {% if 'hi-hat' in item[i] %}
+                            <text x="{{ xpos }}" y="50" font-size="20" text-anchor="middle">✖</text>
+                        {% endif %}
+                        {% if 'tom-1' in item[i] %}
+                            <circle cx="{{ xpos }}" cy="62.5" r="8" fill="black" />
+                        {% endif %}
+                        {% if 'tom-2' in item[i] %}
+                            <circle cx="{{ xpos }}" cy="75" r="8" fill="black" />
+                        {% endif %}
+                        {% if 'floor' in item[i] %}
+                            <circle cx="{{ xpos }}" cy="87.5" r="8" fill="black" />
+                        {% endif %}
+                        {% if 'rest' in item[i] %}
+                            <text x="{{ xpos }}" y="75" font-size="40" text-anchor="middle">𝄾</text>
+                        {% endif %}
+                    {% endfor %}
+                </svg>
+            </div>
+            {% endfor %}
+            <form id="redirect-form" method="POST" action="{{ url_for('cyclic_rotated_entry_page') }}" style="display:none;">
+                <input type="hidden" name="exercise_json" id="exercise-input">
+            </form>
+
+            <form id="hidden-delete-form" method="POST" action="{{ url_for('delete_exercise') }}" >
+              <input type="hidden" name="exercise-to-del" id="ex-to-del-input">
+            </form>
+            <script>
+            const contextMenu = document.getElementById('custom-context-menu');
+
+            document.querySelectorAll('.dada').forEach(svg => {
+                svg.addEventListener('click', () => {
+                    const data = svg.dataset.exercise;
+                    document.getElementById("exercise-input").value = data;
+                    document.getElementById("redirect-form").submit();
+                });
+
+                svg.addEventListener('contextmenu', (e) => {
+                    e.preventDefault()
+                    clickedSVG = event.currentTarget;
+                    contextMenu.style.top = `${event.pageY}px`;
+                    contextMenu.style.left = `${event.pageX}px`;
+                    contextMenu.style.display = 'block';
+                });
+            });
+
+            // Hide menu on any click outside
+            document.addEventListener('click', () => {
+              contextMenu.style.display = 'none';
+            });
+
+            document.getElementById('delete-item').addEventListener('click', () => {
+
+              // Your logic for "Delete"
+              document.getElementById('ex-to-del-input').value = clickedSVG.dataset.ex_id;
+              document.getElementById('hidden-delete-form').submit();
+              contextMenu.style.display = 'none'; // Hide menu after click
+            });
+            </script>
+        {% else %}
+            <h3>no exercises here yet..</h3>
+            <a href="{{ url_for('editor_page') }}">Click Here to create your first one</a>
+        {% endif %}
+    </div>
+</body>
+</html>

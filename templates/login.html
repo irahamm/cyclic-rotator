@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<style>
+    .my_alert{
+    background-color: rgba(200,0,0,0.2);
+    }
+    .my_x{
+    outline: none;
+    }
+</style>
+<body>
+    <header>
+        <nav class="navbar">
+          <div class="logo">CR</div>
+          <ul class="nav-links">
+              <li><a href="{{ url_for('home') }}">Home</a></li>
+              <li><a href="{{ url_for('FAQ_page') }}">FAQ</a></li>
+              <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+          </ul>
+        </nav>
+    </header>
+    <div style="text-align: center;">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+              <div class="my_alert" style="color: red;">
+                  <button onclick="this.parentElement.style.display='none'">×</button>
+                  {{ message }}
+              </div>
+            {% endfor %}
+        {% endif %}
+      {% endwith %}
+      <h2>Login</h2>
+    <form action="{{ url_for('login') }}" method="POST">
+      <input type="text" name="username" placeholder="Username" required><br>
+      <input type="password" name="password" placeholder="Password" required><br>
+      <button type="submit" style="margin: 10px;">Log In</button>
+    </form>
+    </div>
+</body>
+</html>

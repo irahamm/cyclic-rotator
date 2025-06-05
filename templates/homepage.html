@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CyclicRotator</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+  <header>
+    {% if current_user.is_authenticated %}
+    <nav class="navbar">
+      <div class="logo">CR</div>
+      <ul class="nav-links">
+        <li><a href="{{ url_for('FAQ_page') }}">FAQ</a></li>
+        <li><a href="{{ url_for('profile') }}">{{ current_user.username }}</a></li>
+        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+      </ul>
+    </nav>
+    {% else %}
+    <nav class="navbar">
+      <div class="logo">CR</div>
+      <ul class="nav-links">
+        <li><a href="{{ url_for('FAQ_page') }}">FAQ</a></li>
+        <li><a href="{{ url_for('login') }}">Login</a></li>
+        <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+      </ul>
+    </nav>
+    {% endif %}
+  </header>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+          <div class="my_success" style="color: black;">
+              <button onclick="this.parentElement.style.display='none'">×</button>
+              {{ message }}
+          </div>
+        {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <main class="hero">
+    <div class="tagline">
+      <h1>Welcome to CyclicRotator!</h1>
+      {% if current_user.is_authenticated %}
+      <div><a class="my_a" href="{{ url_for('editor_page') }}">Create New Exercise</a></div>
+      <div><a class="my_a" href="{{ url_for('user_exercises') }}">My Exercises</a></div>
+      {% else %}
+      <div><a class="my_a" href="{{ url_for('editor_page') }}">Quick Start</a></div>
+      {% endif %}
+    </div>
+    <div class="animation-container">
+      <!-- Animation goes here -->
+      <img src="{{ url_for('static', filename='thing5.gif') }}" class="gif" alt="animation" />
+    </div>
+  </main>
+</body>
+</html>
