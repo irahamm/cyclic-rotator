@@ -4,9 +4,9 @@ from flask_login import LoginManager, login_user, UserMixin, logout_user, login_
 from utils import rotate, unify_doubles
 from email_validator import validate_email, EmailNotValidError
 import json
-from models import cursor, conn
 from dotenv import load_dotenv
 import os
+import pg8000
 
 load_dotenv()
 
@@ -14,6 +14,10 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 my_bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
+
+# we try something to check if chat is capping us or not:
+conn = None
+cursor = None
 
 
 class User(UserMixin):
@@ -42,6 +46,17 @@ def load_user(user_id):
 @app.route("/")
 @app.route("/home")
 def home():
+    global conn
+    if conn is None:  # this makes the database connection happen after the app has been built
+        conn = pg8000.connect(
+            user="postgres",
+            password=os.getenv("DATABASE_PASSWORD"),
+            host=os.getenv("DATABASE_URL"),
+            port=5432,
+            database="postgres"
+        )
+        global cursor
+        cursor = conn.cursor()
     return render_template('homepage.html')
 
 
@@ -208,3 +223,4 @@ def FAQ_page():
 
 if __name__ == "__main__":
     app.run()
+
