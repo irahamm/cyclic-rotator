@@ -1,9 +1,8 @@
-# import pg8000
-# import os
-# from dotenv import load_dotenv
+import pg8000
+import os
+from dotenv import load_dotenv
 # import ssl
 #
-# load_dotenv()
 #
 # conn = None
 '''
@@ -20,3 +19,12 @@ conn = pg8000.connect(
     ssl_context=ssl_context
 )
 '''
+conn = pg8000.connect(
+    user=os.getenv("DATABASE_USERNAME"),
+    password=os.getenv("DATABASE_PASSWORD"),
+    host=os.getenv("DATABASE_URL"),
+    port=5432,
+    database=os.getenv("DATABASE_NAME")
+)
+
+cursor = conn.cursor()
